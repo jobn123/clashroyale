@@ -52,4 +52,19 @@ def tt():
 
       print(len(pd))
     page = page + 1
-tt()
+# tt()
+
+
+def getAllPopularCards():
+  popularCardsurl = 'http://statsroyale.com/top/cards'
+  r = requests.get(popularCardsurl)
+  soup = BeautifulSoup(r.content, "html.parser")
+  popularCards = soup.find_all(class_="popularCards__card")
+  
+  print(len(popularCards))
+  for item in popularCards:
+    im = item.find('img')
+    print(im['src'])
+    print(item['data-winrate'])
+    print(item['data-usage'])
+getAllPopularCards()
