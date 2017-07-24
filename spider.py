@@ -45,7 +45,7 @@ def tt():
         # img
         tx = p_item.find_all("img")
         print(set(tag['src'] for tag in tx))
-        
+          
         # per
         percent = p_item.find("div", class_="ui__headerBig")
         print(percent.text)
@@ -54,13 +54,12 @@ def tt():
     page = page + 1
 # tt()
 
-
 def getAllPopularCards():
   popularCardsurl = 'http://statsroyale.com/top/cards'
   r = requests.get(popularCardsurl)
   soup = BeautifulSoup(r.content, "html.parser")
   popularCards = soup.find_all(class_="popularCards__card")
-  
+
   print(len(popularCards))
   for item in popularCards:
     im = item.find('img')

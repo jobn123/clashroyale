@@ -21,5 +21,6 @@ from clashwar import views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^clashwar/$', views.Home, name='Home'),
+    url(r'^allpopularCards/$', views.AllPopularCards, name='AllPopularCards'),
     url(r'^api/', include('clashwar.urls')),
 ]

@@ -2,8 +2,10 @@ from django.shortcuts import render
 from django.http import HttpResponse
 
 from clashwar.models import ArenaCards
+from clashwar.models import PopularCards
 from rest_framework import generics
 from .serializers import ArenaCardsSerializer
+from .serializers import PopularCardsSerializer
 
 import requests
 from bs4 import BeautifulSoup
@@ -14,7 +16,12 @@ def Home(request):
 
   getArenaCards()
   return render(request, 'index.html')
-  
+
+def AllPopularCards(request):
+
+  getAllPopularCards()
+  return HttpResponse("Hello World!")
+
 def getArenaCards():
   page = 1
 
@@ -55,6 +62,28 @@ def getArenaCards():
       print(len(pd))
     page = page + 1
 
+# getAll popularcards
+def getAllPopularCards():
+  popularCardsurl = 'http://statsroyale.com/top/cards'
+  r = requests.get(popularCardsurl)
+  soup = BeautifulSoup(r.content, "html.parser")
+  popularCards = soup.find_all(class_="popularCards__card")
+  
+  print(len(popularCards))
+  allPopularCards = []
+  pc = PopularCards()
+  for item in popularCards:
+    im = item.find('img')
+    d = {
+          "img": im['src'],
+          "winrate": item['data-winrate'],
+          "usage": item['data-usage']
+        }
+    allPopularCards.append(d)
+
+    print(allPopularCards)
+    pc.cards = allPopularCards
+    pc.save()
 
 class CreateArenaCardsView(generics.ListCreateAPIView):
     """This class defines the create behavior of our rest api."""
@@ -62,5 +91,14 @@ class CreateArenaCardsView(generics.ListCreateAPIView):
     serializer_class = ArenaCardsSerializer
     
     def perform_create(self, serializer):
-        """Save the post data when creating a new bucketlist."""
-        serializer.save()
+      """Save the post data when creating a new bucketlist."""
+      serializer.save()
+
+class CreatePopularCardsView(generics.ListCreateAPIView):
+  """This class defines the create behavior of our rest api."""
+  queryset = PopularCards.objects.all()
+  serializer_class = PopularCardsSerializer
+    
+  def perform_create(self, serializer):
+    """Save the post data when creating a new bucketlist."""
+    serializer.save()
