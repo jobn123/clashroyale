@@ -66,4 +66,19 @@ def getAllPopularCards():
     print(im['src'])
     print(item['data-winrate'])
     print(item['data-usage'])
-getAllPopularCards()
+# getAllPopularCards()
+
+def getAllDecks():
+  popularCardsurl = 'http://statsroyale.com'
+  r = requests.get(popularCardsurl)
+  soup = BeautifulSoup(r.content, "html.parser")
+  decks = soup.find_all(class_="ui__card landing__arenaContainer")
+
+  print(len(decks)) 
+  for item in decks:
+    im = item.find('img')
+    if im:
+      print(im['src'])
+      print(item.find(class_='ui__headerSmall').text)
+      print(item.find(class_='ui__mediumText landing__arenaValue').text)
+getAllDecks()

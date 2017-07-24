@@ -9,3 +9,8 @@ class ArenaCards(models.Model):
 
 class PopularCards(models.Model):
   cards = JSONField()
+
+class Decks(models.Model):
+  title = models.CharField(max_length=30)
+  place = models.CharField(max_length=30)
+  img =  models.CharField(max_length=30)
