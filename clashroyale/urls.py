@@ -22,5 +22,6 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^clashwar/$', views.Home, name='Home'),
     url(r'^allpopularCards/$', views.AllPopularCards, name='AllPopularCards'),
+    url(r'^allDecks/$', views.AllDecks, name='AllDecks'),
     url(r'^api/', include('clashwar.urls')),
 ]

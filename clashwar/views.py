@@ -3,6 +3,7 @@ from django.http import HttpResponse
 
 from clashwar.models import ArenaCards
 from clashwar.models import PopularCards
+from clashwar.models import Decks
 from rest_framework import generics
 from .serializers import ArenaCardsSerializer
 from .serializers import PopularCardsSerializer
@@ -21,6 +22,11 @@ def AllPopularCards(request):
 
   getAllPopularCards()
   return HttpResponse("Hello World!")
+
+def AllDecks(request):
+
+  getAllDecks()
+  return HttpResponse("get all decks!")
 
 def getArenaCards():
   page = 1
@@ -85,6 +91,27 @@ def getAllPopularCards():
     pc.cards = allPopularCards
     pc.save()
 
+#==================getAllDecks======================#
+def getAllDecks():
+  popularCardsurl = 'http://statsroyale.com'
+  r = requests.get(popularCardsurl)
+  soup = BeautifulSoup(r.content, "html.parser")
+  decks = soup.find_all(class_="ui__card landing__arenaContainer")
+
+  print(len(decks)) 
+  for item in decks:
+    dc = Decks()
+    im = item.find('img')
+    if im:
+      dc.img = im['src']
+      dc.title = item.find(class_='ui__headerSmall').text
+      dc.place = item.find(class_='ui__mediumText landing__arenaValue').text
+      dc.save()
+      # print(im['src'])
+      # print(item.find(class_='ui__headerSmall').text)
+      # print(item.find(class_='ui__mediumText landing__arenaValue').text)
+
+
 class CreateArenaCardsView(generics.ListCreateAPIView):
     """This class defines the create behavior of our rest api."""
     queryset = ArenaCards.objects.all()
@@ -98,7 +125,7 @@ class CreatePopularCardsView(generics.ListCreateAPIView):
   """This class defines the create behavior of our rest api."""
   queryset = PopularCards.objects.all()
   serializer_class = PopularCardsSerializer
-    
+
   def perform_create(self, serializer):
     """Save the post data when creating a new bucketlist."""
     serializer.save()
