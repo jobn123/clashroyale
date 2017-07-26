@@ -14,3 +14,7 @@ class Decks(models.Model):
   title = models.CharField(max_length=30)
   place = models.CharField(max_length=100)
   img =  models.CharField(max_length=30)
+
+class DeckCards(models.Model):
+  popularCards = JSONField()
+  decks = JSONField()

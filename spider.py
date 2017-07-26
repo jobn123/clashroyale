@@ -73,12 +73,24 @@ def getAllDecks():
   r = requests.get(popularCardsurl)
   soup = BeautifulSoup(r.content, "html.parser")
   decks = soup.find_all(class_="ui__card landing__arenaContainer")
-
-  print(len(decks)) 
+  cards = soup.find_all(class_="widget__cardMetric")
+  cardsArr = []
+  for card in cards:
+    a = card.find("a")
+    tt = {
+      "cardImg": "https://statsroyale.com" + a['href'],
+      "cardName": card.find(class_="ui__headerSmall").text,
+      "cardUsage": card.find(class_="widget__cardUsageTotal").text
+    }
+    cardsArr.append(tt)
+  decksArr = []
   for item in decks:
     im = item.find('img')
     if im:
-      print(im['src'])
-      print(item.find(class_='ui__headerSmall').text)
-      print(item.find(class_='ui__mediumText landing__arenaValue').text)
+      dd = {
+        "deckImg": "https://statsroyale.com" + im['src'],
+        "deckLevel": item.find(class_='ui__headerSmall').text,
+        "deckPlace": item.find(class_='ui__mediumText landing__arenaValue').text
+      }
+      decksArr.append(dd)
 getAllDecks()

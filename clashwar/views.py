@@ -4,10 +4,13 @@ from django.http import HttpResponse
 from clashwar.models import ArenaCards
 from clashwar.models import PopularCards
 from clashwar.models import Decks
+from clashwar.models import DeckCards
+
 from rest_framework import generics
 from .serializers import ArenaCardsSerializer
 from .serializers import PopularCardsSerializer
 from .serializers import DecksSerializer
+from .serializers import DeckCardsSerializer
 
 import requests
 from bs4 import BeautifulSoup
@@ -26,7 +29,8 @@ def AllPopularCards(request):
 
 def AllDecks(request):
 
-  getAllDecks()
+  # getAllDecks()
+  getDeckCards()
   return HttpResponse("get all decks!")
 
 def getArenaCards():
@@ -109,6 +113,37 @@ def getAllDecks():
       dc.place = item.find(class_='ui__mediumText landing__arenaValue').text
       dc.save()
 
+def getDeckCards():
+  popularCardsurl = 'http://statsroyale.com'
+  r = requests.get(popularCardsurl)
+  soup = BeautifulSoup(r.content, "html.parser")
+  decks = soup.find_all(class_="ui__card landing__arenaContainer")
+  cards = soup.find_all(class_="widget__cardMetric")
+  
+  cardsArr = []
+  for card in cards:
+    a = card.find("a")
+    tt = {
+      "cardImg": "https://statsroyale.com" + a['href'],
+      "cardName": card.find(class_="ui__headerSmall").text,
+      "cardUsage": card.find(class_="widget__cardUsageTotal").text
+    }
+    cardsArr.append(tt)
+  decksArr = []
+  for item in decks:
+    im = item.find('img')
+    if im:
+      dd = {
+        "deckImg": "https://statsroyale.com" + im['src'],
+        "deckLevel": item.find(class_='ui__headerSmall').text,
+        "deckPlace": item.find(class_='ui__mediumText landing__arenaValue').text
+      }
+      decksArr.append(dd)
+  dCards = DeckCards()
+  dCards.popularCards = cardsArr
+  dCards.decks = decksArr
+  dCards.save()
+
 class CreateArenaCardsView(generics.ListCreateAPIView):
     """This class defines the create behavior of our rest api."""
     queryset = ArenaCards.objects.all()
@@ -131,6 +166,15 @@ class CreateDecksView(generics.ListCreateAPIView):
   """This class defines the create behavior of our rest api."""
   queryset = Decks.objects.all()
   serializer_class = DecksSerializer
+
+  def perform_create(self, serializer):
+    """Save the post data when creating a new bucketlist."""
+    serializer.save()
+
+class CreateDeckCardsView(generics.ListCreateAPIView):
+  """This class defines the create behavior of our rest api."""
+  queryset = DeckCards.objects.all()
+  serializer_class = DeckCardsSerializer
 
   def perform_create(self, serializer):
     """Save the post data when creating a new bucketlist."""

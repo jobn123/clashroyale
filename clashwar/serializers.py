@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import ArenaCards
 from .models import PopularCards
 from .models import Decks
+from .models import DeckCards
 
 class ArenaCardsSerializer(serializers.ModelSerializer):
    """Serializer to map the Model instance into JSON format."""
@@ -26,3 +27,11 @@ class DecksSerializer(serializers.ModelSerializer):
       """Meta class to map serializer's fields with the model fields."""
       model = Decks
       fields = ('id', 'title', 'place', 'img')
+
+class DeckCardsSerializer(serializers.ModelSerializer):
+   """Serializer to map the Model instance into JSON format."""
+
+   class Meta:
+      """Meta class to map serializer's fields with the model fields."""
+      model = DeckCards
+      fields = ('popularCards', 'decks')
