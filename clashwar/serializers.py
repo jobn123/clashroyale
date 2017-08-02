@@ -14,7 +14,8 @@ class ArenaCardsSerializer(serializers.ModelSerializer):
 
 class PopularCardsSerializer(serializers.ModelSerializer):
    """Serializer to map the Model instance into JSON format."""
-
+   cards = serializers.ListField(
+      child=serializers.DictField())
    class Meta:
       """Meta class to map serializer's fields with the model fields."""
       model = PopularCards
@@ -30,6 +31,11 @@ class DecksSerializer(serializers.ModelSerializer):
 
 class DeckCardsSerializer(serializers.ModelSerializer):
    """Serializer to map the Model instance into JSON format."""
+   popularCards = serializers.ListField(
+      child=serializers.DictField())
+   
+   decks = serializers.ListField(
+      child=serializers.DictField())
 
    class Meta:
       """Meta class to map serializer's fields with the model fields."""
