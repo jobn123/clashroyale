@@ -18,3 +18,7 @@ class Decks(models.Model):
 class DeckCards(models.Model):
   popularCards = JSONField()
   decks = JSONField()
+
+class PopularDecks(models.Model):
+  winrate = models.CharField(max_length=30)
+  imgs = JSONField()

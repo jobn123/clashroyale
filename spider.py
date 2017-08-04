@@ -93,4 +93,5 @@ def getAllDecks():
         "deckPlace": item.find(class_='ui__mediumText landing__arenaValue').text
       }
       decksArr.append(dd)
-getAllDecks()
+# getAllDecks()
+
