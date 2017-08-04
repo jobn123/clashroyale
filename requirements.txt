@@ -53,3 +53,4 @@ urllib3==1.21.1
 virtualenv==15.1.0
 wrapt==1.10.10
 yarl==0.10.0
+gunicorn=19.7.1
