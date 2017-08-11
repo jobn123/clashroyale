@@ -21,7 +21,7 @@ import json
 # Create your views here.
 def Home(request):
   # return HttpResponse("Hello World!")
-
+  
   getArenaCards()
   return render(request, 'index.html')
 
