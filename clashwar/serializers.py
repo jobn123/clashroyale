@@ -6,11 +6,12 @@ from .models import DeckCards
 
 class ArenaCardsSerializer(serializers.ModelSerializer):
    """Serializer to map the Model instance into JSON format."""
-
+   cards = serializers.ListField(child=serializers.DictField())
+   
    class Meta:
       """Meta class to map serializer's fields with the model fields."""
       model = ArenaCards
-      fields = ('id', 'title', 'percentage', 'cards')
+      fields = ('id', 'cards')
 
 class PopularCardsSerializer(serializers.ModelSerializer):
    """Serializer to map the Model instance into JSON format."""

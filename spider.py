@@ -95,3 +95,38 @@ def getAllDecks():
       decksArr.append(dd)
 # getAllDecks()
 
+def getArenaPopularCards():
+  page = 1
+  # while (page <= 11):
+  arenaCardsurl = 'https://statsroyale.com/deckbuilder/?arena='+str(page)
+  r = requests.get(arenaCardsurl)
+  soup = BeautifulSoup(r.content, "html.parser")
+
+  arenas = soup.find_all(class_="deckbuilder__suggestions")
+  print(len(arenas))
+
+  d = {'title': '', 'imgs':[], 'winrate':'', 'describe':'', 'subDescribe':''}
+  a = []
+  for arena in arenas:
+    arenaTitle = arena.find_all(class_="ui__headerSmall")
+    # for title in arenaTitle:
+    # print("+++++++arenaTitle+++++++++++++" + arenaTitle[0].text)
+    d['title'] =  arenaTitle[0].text
+    ii = arena.find_all(class_="popularDecks__decks")
+    # print(len(ii))
+    
+    for item in ii:
+      img = item.find_all('img')
+      # print(set(tag['src'] for tag in img))
+      # print(item.find(class_="ui__headerBig").text)
+      # print(item.find_all(class_="ui__mediumText")[0].text)
+      # print(item.find_all(class_="ui__mediumText")[1].text)
+      
+      d['imgs'] = set(tag['src'] for tag in img)
+      d['winrate'] = item.find(class_="ui__headerBig").text
+      d['describe'] = item.find_all(class_="ui__mediumText")[0].text
+      d['subDescribe'] = item.find_all(class_="ui__mediumText")[1].text
+
+      a.append(d)
+    print(a)
+getArenaPopularCards()

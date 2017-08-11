@@ -7,6 +7,7 @@ from clashwar.models import Decks
 from clashwar.models import DeckCards
 
 from rest_framework import generics
+from rest_framework.response import Response
 from .serializers import ArenaCardsSerializer
 from .serializers import PopularCardsSerializer
 from .serializers import DecksSerializer
@@ -15,6 +16,8 @@ from .serializers import DeckCardsSerializer
 import requests
 from bs4 import BeautifulSoup
 import re
+
+import json
 # Create your views here.
 def Home(request):
   # return HttpResponse("Hello World!")
@@ -35,42 +38,38 @@ def AllDecks(request):
 
 def getArenaCards():
   page = 1
-
+  
   while (page <= 11):
-    url = 'http://statsroyale.com/deckbuilder/?arena=' + str(page)
-    r = requests.get(url)
-
-    # get Titles
-    pattern = re.compile('<div class="ui__headerSmall">(.*?)</div>', re.S)
-    titles = re.findall(pattern, r.text)
-    print("========第"+ str(page)+"页数据==========")
-    print('============titles===============')
-    print(titles)
+    arenaCardsurl = 'https://statsroyale.com/deckbuilder/?arena='+str(page)
+    r = requests.get(arenaCardsurl)
     soup = BeautifulSoup(r.content, "html.parser")
-    deckbuilder = soup.find_all(class_="deckbuilder__suggestionsGroup")
-    print('============contents===============')
-    print(len(deckbuilder))
-    deckbuilders = []
+
+    arenas = soup.find_all(class_="deckbuilder__suggestions")
+    print(len(arenas))
 
     ac = ArenaCards()
-    for t in deckbuilder:
-      ac.title = "Ladder Deck Suggestions"
-      # popular cards
-      pd = t.find_all(class_='popularDecks__decks')
+    d = {'title': '', 'imgs':[], 'winrate':'', 'describe':'', 'subDescribe':''}
+    a = []
+    for arena in arenas:
+      arenaTitle = arena.find_all(class_="ui__headerSmall")
+      # for title in arenaTitle:
+      # print("+++++++arenaTitle+++++++++++++" + arenaTitle[0].text)
+      d['title'] =  arenaTitle[0].text
+      ii = arena.find_all(class_="popularDecks__decks")
+      # print(len(ii))
       
-      for p_item in pd:
-        # img
-        tx = p_item.find_all("img")
-        # print(set(tag['src'] for tag in tx))
-        deckbuilders.append(set(tag['src'] for tag in tx))
-        ac.cards = deckbuilders
-        print(deckbuilders)
-        # per
-        percent = p_item.find("div", class_="ui__headerBig")
-        ac.percentage = percent.text
-        print(percent.text)
-        ac.save()
-      print(len(pd))
+      for item in ii:
+        img = item.find_all('img')
+
+        d['imgs'] = set(tag['src'] for tag in img)
+        d['winrate'] = item.find(class_="ui__headerBig").text
+        d['describe'] = item.find_all(class_="ui__mediumText")[0].text
+        d['subDescribe'] = item.find_all(class_="ui__mediumText")[1].text
+
+        a.append(d)
+      print(a)
+      ac.cards = a
+      ac.save()
     page = page + 1
 
 # getAll popularcards
@@ -179,3 +178,24 @@ class CreateDeckCardsView(generics.ListCreateAPIView):
   def perform_create(self, serializer):
     """Save the post data when creating a new bucketlist."""
     serializer.save()
+
+class ArenaCardsByIdView(generics.ListCreateAPIView):
+  """This class defines the create behavior of our rest api."""
+  queryset = ArenaCards.objects.all()
+  serializer_class = ArenaCardsSerializer
+  print('------------ArenaCardsByIdView--------------')
+  # def perform_create(self, serializer):
+  #   """Save the post data when creating a new bucketlist."""
+  #   print(self.request.id)
+  #   serializer.save()
+  def list(self, list):
+    id = self.request.query_params.get('aid', None)
+    # id = self.aid
+    print(id)
+    serializer = ArenaCards.objects.get(id=id)
+    response_data = {
+      "success": "true",
+      "msg": "success",
+      "data": serializer.cards,
+    }
+    return Response(response_data)
