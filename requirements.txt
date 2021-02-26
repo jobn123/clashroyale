@@ -1,4 +1,4 @@
-aiohttp==2.0.5
+aiohttp==3.7.4
 aiomysql==0.0.9
 appdirs==1.4.3
 astroid==1.4.9
